@@ -32,7 +32,6 @@ function Pipeline(){
 }
 
 function Zip(aliasParam){
-    console.log("falan filan");
     const alias = aliasParam;
     var process = "";
     const sources = new Array();
