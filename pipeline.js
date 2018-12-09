@@ -1,6 +1,9 @@
 const fs = require('fs');
 const winston = require('winston')
 
+
+var DataSourceType = { GLOBAL : "global", LOCAL : "local"};
+
 function PipelineObject(){
     this.components = new Array();
 }
@@ -26,35 +29,23 @@ function Pipeline(){
 
 function PipelineComponent(aliasParam){
     this.alias = aliasParam;
-    this.conflation = "";
+    this.conflation = undefined;
 }
 PipelineComponent.prototype.withConflation = function(conflateFunc){
     this.conflation = conflateFunc.toString();
     return this;
 }
 
-function SourceObject(aliasParam,criteriaParam,maskParam){
+function SourceObject(aliasParam,typeParam,filterParam,exclusionsParam){
     PipelineComponent.call(this,aliasParam);
-    this.criteria = criteriaParam;
-    this.mask = maskParam;
-    this.process = ""
+    this.filter = filterParam;
+    this.exclusions = exclusionsParam;
+    this.type = typeParam;
 }
-SourceObject.prototype.withProcess = function(process){
-    this.process = process.toString();
-    return this;
-}
-/*SourceObject.prototype.toJSON = function(){
-    return JSON.stringify({
-        "alias" : this.alias,
-        "mask" : this.mask,
-        "criteria" : this.criteria,
-        "process" : 
-    });
-}*/
 SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
-function Source(alias,criteria,mask){
-   return new SourceObject(alias,criteria,mask);
+function Source(alias,type,criteria,mask){
+   return new SourceObject(alias,type,criteria,mask);
 }
 
 function Criteria(field, operator, value) {
@@ -63,18 +54,20 @@ function Criteria(field, operator, value) {
     this.value = value;
 }
 
-function PipelineProcessingComponent(aliasParam){
+function PipelineProcessingComponent(aliasParam, isFinal){
     PipelineComponent.call(this,aliasParam);
-    this.process = function(){};
+    this.process = undefined;
+    this.final = isFinal;
 }
 PipelineProcessingComponent.prototype = Object.create(PipelineComponent.prototype);
 PipelineProcessingComponent.prototype.withProcess = function(func){
-    process = func;
+    this.process = func.toString();
     return this;
 }
 
-function ZipObject(aliasParam){
-    PipelineProcessingComponent.call(this,aliasParam);
+function ZipObject(aliasParam,isFinal){
+    PipelineProcessingComponent.call(this,aliasParam,isFinal);
+    this["@type"]="Zip"
     this.sources = new Array();
 }
 ZipObject.prototype = Object.create(PipelineProcessingComponent.prototype);
@@ -84,12 +77,15 @@ ZipObject.prototype.withSource = function(source){
     return this;
 }
 
-function Zip(aliasParam){
-    return new ZipObject(aliasParam);
+function Zip(aliasParam,isFinal){
+    return new ZipObject(aliasParam,isFinal);
 }
 
 
 SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
 
-module.exports = {Pipeline,Zip,Source,Criteria}
+module.exports = {
+    DataSourceType,
+    Pipeline,Zip,Source,Criteria
+}
