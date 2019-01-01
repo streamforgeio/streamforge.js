@@ -1,24 +1,43 @@
 const sf = require('./pipeline.js');
 
 var p = sf.Pipeline().withComponent(
-                            sf.Zip("add")
+                            sf.Zip("bitcoin-calculation")
                                 .withProcess(function(p1,p2){
-                                                            return { 'value': (p1.value + p2.value )} 
+                                                            print('P2 --> ' + JSON.stringify(p2));
+                                                            print('P1 --> ' + JSON.stringify(p1));
+                                                            var r = { 'amount': (p1.vout[0].amount * p2.body.result.price.last ) /1000000 } 
+                                                            print('result ' + JSON.stringify(r));
+                                                            return r;
                                                         })
                                 .withSource(
-                                    sf.Source("s1",sf.DataSourceType.GLOBAL)
+                                    sf.Source("btc-raw",sf.DataSourceType.GLOBAL)
                                 )
                                 .withSource(
-                                    sf.Source("s2",sf.DataSourceType.GLOBAL)
+                                    sf.Source("ico-parity",sf.DataSourceType.GLOBAL,function(s){ return s.ico == 'btc' 
+                                                                                                        && s.currency == 'usd' 
+                                                                                                        && s.market == 'bitfinex'; })
                                 )
-                            )
-            .withComponent(sf.Zip("add2",true)
+                    ).withComponent(
+                                sf.Zip("ethereum-calculation")
                                 .withProcess(function(p1,p2){
-                                    return {'value': (p1.value + p2.value)}
-                                }).withSource(
-                                    sf.Source("s3",sf.DataSourceType.GLOBAL))
-                                  .withSource(
-                                      sf.Source("add",sf.DataSourceType.LOCAL)))
+                                                            var r = { 'amount': (p1.gas * p2.body.result.price.last ) /1000000 } 
+                                                            return r;
+                                                        })
+                                .withSource(
+                                    sf.Source("eth-pending",sf.DataSourceType.GLOBAL)
+                                )
+                                .withSource(
+                                    sf.Source("ico-parity",sf.DataSourceType.GLOBAL,function(s){ return s.ico == 'eth' 
+                                                                                                        && s.currency == 'usd' 
+                                                                                                        && s.market == 'bitfinex'; })
+                                )
+                    ).withComponent(
+                                sf.Zip("compare",true )
+                                .withProcess(function(p1,p2){
+                                    return { "btc-usd-amount" : p1.amount, "eth-usd-amount" : p2.amount};
+                                }).withSource(sf.Source("bitcoin-calculation",sf.DataSourceType.LOCAL))
+                                .withSource(sf.Source("ethereum-calculation",sf.DataSourceType.LOCAL))
+                    )
                             
 console.log(JSON.stringify(p));
 p.save("/tmp/sf.json")

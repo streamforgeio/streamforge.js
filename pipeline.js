@@ -2,9 +2,13 @@ const fs = require('fs');
 const winston = require('winston')
 
 
-var DataSourceType = { GLOBAL : "global", LOCAL : "local"};
+var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
 
-function PipelineObject(){
+function PipelineObject(dsType){
+    if (dsType)
+        this.dsType=dsType;
+    else 
+        this.dsType="kafka"
     this.components = new Array();
 }
 PipelineObject.prototype.withComponent = function(z){
@@ -23,8 +27,8 @@ PipelineObject.prototype.submit = function(){
     // submit to streamforge.io
 }
 
-function Pipeline(){
-    return new PipelineObject();
+function Pipeline(dsType){
+    return new PipelineObject(dsType);
 }
 
 function PipelineComponent(aliasParam){
@@ -36,16 +40,17 @@ PipelineComponent.prototype.withConflation = function(conflateFunc){
     return this;
 }
 
-function SourceObject(aliasParam,typeParam,filterParam,exclusionsParam){
+function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParam){
     PipelineComponent.call(this,aliasParam);
-    this.filter = filterParam;
+    if (filterFunc)
+        this.filter = filterFunc.toString();
     this.exclusions = exclusionsParam;
-    this.type = typeParam;
+    this.scope = scopeParam;
 }
 SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
-function Source(alias,type,criteria,mask){
-   return new SourceObject(alias,type,criteria,mask);
+function Source(alias,scope,filterFunc,mask){
+   return new SourceObject(alias,scope,filterFunc,mask);
 }
 
 function Criteria(field, operator, value) {
@@ -86,6 +91,6 @@ SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
 
 module.exports = {
-    DataSourceType,
+    DataSourceType: DataSourceScope,
     Pipeline,Zip,Source,Criteria
 }
