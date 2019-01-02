@@ -3,7 +3,7 @@ const winston = require('winston')
 
 
 var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
-var ConflationType = { KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
+var ConflationType = { CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
 
 function PipelineObject(dsType){
     if (dsType)
