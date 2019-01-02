@@ -3,6 +3,7 @@ const winston = require('winston')
 
 
 var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
+var ConflationType = { KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
 
 function PipelineObject(dsType){
     if (dsType)
@@ -35,22 +36,29 @@ function PipelineComponent(aliasParam){
     this.alias = aliasParam;
     this.conflation = undefined;
 }
-PipelineComponent.prototype.withConflation = function(conflateFunc){
-    this.conflation = conflateFunc.toString();
+PipelineComponent.prototype.withConflation = function(conflation){
+    var conflationContext = new Object();
+    if (typeof conflation === 'object'){
+        conflationContext.type = conflation.type 
+        conflationContext.func = conflation.conflateFunc.toString();
+    } else if (typeof conflation === 'string'){
+        conflationContext.type = conflation
+    }
+    this.conflationContext = conflationContext;
     return this;
 }
 
-function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParam){
+function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParams){
     PipelineComponent.call(this,aliasParam);
     if (filterFunc)
         this.filter = filterFunc.toString();
-    this.exclusions = exclusionsParam;
+    this.exclusions = exclusionsParams;
     this.scope = scopeParam;
 }
 SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
-function Source(alias,scope,filterFunc,mask){
-   return new SourceObject(alias,scope,filterFunc,mask);
+function Source(alias,scope,filterFunc,exclusions){
+   return new SourceObject(alias,scope,filterFunc,exclusions);
 }
 
 function Criteria(field, operator, value) {
@@ -91,6 +99,6 @@ SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
 
 module.exports = {
-    DataSourceType: DataSourceScope,
+    DataSourceType: DataSourceScope,ConflationType,
     Pipeline,Zip,Source,Criteria
 }

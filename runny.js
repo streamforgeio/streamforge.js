@@ -3,14 +3,13 @@ const sf = require('./pipeline.js');
 var p = sf.Pipeline().withComponent(
                             sf.Zip("bitcoin-calculation")
                                 .withProcess(function(p1,p2){
-                                                            print('P2 --> ' + JSON.stringify(p2));
-                                                            print('P1 --> ' + JSON.stringify(p1));
+                                                            if (p1.vout.length == 0)
+                                                                return {'amount' : 0}
                                                             var r = { 'amount': (p1.vout[0].amount * p2.body.result.price.last ) /1000000 } 
-                                                            print('result ' + JSON.stringify(r));
                                                             return r;
                                                         })
                                 .withSource(
-                                    sf.Source("btc-raw",sf.DataSourceType.GLOBAL)
+                                    sf.Source("btc-raw",sf.DataSourceType.GLOBAL).withConflation(sf.ConflationType.KEEP_LATEST)
                                 )
                                 .withSource(
                                     sf.Source("ico-parity",sf.DataSourceType.GLOBAL,function(s){ return s.ico == 'btc' 
