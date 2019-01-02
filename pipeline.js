@@ -3,7 +3,7 @@ const winston = require('winston')
 
 
 var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
-var ConflationType = { CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
+var ConflationType = { NONE:"none", CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
 
 function PipelineObject(dsType){
     if (dsType)
@@ -34,7 +34,7 @@ function Pipeline(dsType){
 
 function PipelineComponent(aliasParam){
     this.alias = aliasParam;
-    this.conflation = undefined;
+    this.conflationContext = { type : ConflationType.NONE};
 }
 PipelineComponent.prototype.withConflation = function(conflation){
     var conflationContext = new Object();
@@ -50,6 +50,7 @@ PipelineComponent.prototype.withConflation = function(conflation){
 
 function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParams){
     PipelineComponent.call(this,aliasParam);
+    this["@type"]="Source"
     if (filterFunc)
         this.filter = filterFunc.toString();
     this.exclusions = exclusionsParams;
@@ -69,12 +70,12 @@ function Criteria(field, operator, value) {
 
 function PipelineProcessingComponent(aliasParam, isFinal){
     PipelineComponent.call(this,aliasParam);
-    this.process = undefined;
+    this.func = undefined;
     this.final = isFinal;
 }
 PipelineProcessingComponent.prototype = Object.create(PipelineComponent.prototype);
 PipelineProcessingComponent.prototype.withProcess = function(func){
-    this.process = func.toString();
+    this.func = func.toString();
     return this;
 }
 
