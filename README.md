@@ -1,6 +1,6 @@
 # StremForge.IO
 
-StreamForge.io is a javascriptframework that enables you to process streams from multiple stream sources.
+StreamForge.io is a javascript framework that enables you to process streams from multiple stream sources.
 
 ##Sample
 
@@ -235,8 +235,6 @@ Out of box Sinks are ;
 * WebSocket Sink
 * WebHook Sink
 * RDBMS Sink
-* S3 Sink
-* NoSQL Sink
 * API Sink , a generic built-in sink type. (Also API library can be used in the js file.)
 
 
