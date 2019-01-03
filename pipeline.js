@@ -3,7 +3,7 @@ const winston = require('winston')
 
 
 var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
-var ConflationType = { NONE:"none", CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
+var ConflationType = { CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
 
 function PipelineObject(dsType){
     if (dsType)
@@ -34,13 +34,13 @@ function Pipeline(dsType){
 
 function PipelineComponent(aliasParam){
     this.alias = aliasParam;
-    this.conflationContext = { type : ConflationType.NONE};
+    this.conflationContext = { type : ConflationType.KEEP_LATEST};
 }
 PipelineComponent.prototype.withConflation = function(conflation){
     var conflationContext = new Object();
-    if (typeof conflation === 'object'){
-        conflationContext.type = conflation.type 
-        conflationContext.func = conflation.conflateFunc.toString();
+    if (typeof conflation === 'function'){
+        conflationContext.type = ConflationType.CUSTOM
+        conflationContext.func = conflation.toString();
     } else if (typeof conflation === 'string'){
         conflationContext.type = conflation
     }

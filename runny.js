@@ -9,7 +9,7 @@ var p = sf.Pipeline().withComponent(
                                                             return r;
                                                         })
                                 .withSource(
-                                    sf.Source("btc-raw",sf.DataSourceType.GLOBAL).withConflation(sf.ConflationType.KEEP_LATEST)
+                                    sf.Source("btc-raw",sf.DataSourceType.GLOBAL)
                                 )
                                 .withSource(
                                     sf.Source("ico-parity",sf.DataSourceType.GLOBAL,function(s){ return s.ico == 'btc' 
@@ -23,7 +23,9 @@ var p = sf.Pipeline().withComponent(
                                                             return r;
                                                         })
                                 .withSource(
-                                    sf.Source("eth-pending",sf.DataSourceType.GLOBAL)
+                                    sf.Source("eth-pending",sf.DataSourceType.GLOBAL).withConflation(function(s1,s2){
+                                                return {'gas': (s1.gas + s2.gas) }
+                                            })
                                 )
                                 .withSource(
                                     sf.Source("ico-parity",sf.DataSourceType.GLOBAL,function(s){ return s.ico == 'eth' 
