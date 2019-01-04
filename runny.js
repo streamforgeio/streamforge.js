@@ -45,7 +45,9 @@ var p = sf.Pipeline().withComponent(
 		})
 	)
 ).withComponent(
-	sf.Zip("compare", true)
+    sf.Zip("compare", sf.APISink("http://api-sink.streamforge.io/api/total-transactions",
+    {   "method":"POST",
+        "api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
 	.withProcess(function(p1, p2) {
 		return {
 			"btc-usd-amount": p1.amount,
