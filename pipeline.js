@@ -48,6 +48,25 @@ PipelineComponent.prototype.withConflation = function(conflation){
     return this;
 }
 
+
+
+function SinkComponent(aliasParam,sourceParam,additionalProperties){
+    this.alias = aliasParam;
+    this.source = sourceParam;
+    this.additionalProperties = additionalProperties;
+}
+
+function APISinkObject(aliasParam,sourceParam,url,additionalProperties){
+    SinkComponent.call(this,aliasParam,sourceParam,additionalProperties);
+    this["@type"]="APISink"
+    this.url = url;
+}
+APISinkObject.prototype = Object.create(SinkComponent.prototype);
+
+function APISink(alias,source,url,httpParams,additionalParams){
+    return new APISinkObject(alias,source,url,httpParams,additionalParams)
+}
+
 function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParams){
     PipelineComponent.call(this,aliasParam);
     this["@type"]="Source"
@@ -68,14 +87,17 @@ function Criteria(field, operator, value) {
     this.value = value;
 }
 
-function PipelineProcessingComponent(aliasParam, isFinal){
+function PipelineProcessingComponent(aliasParam){
     PipelineComponent.call(this,aliasParam);
     this.func = undefined;
-    this.final = isFinal;
 }
 PipelineProcessingComponent.prototype = Object.create(PipelineComponent.prototype);
 PipelineProcessingComponent.prototype.withProcess = function(func){
     this.func = func.toString();
+    return this;
+}
+PipelineProcessingComponent.prototype.toSink = function(sink){
+    this.sink = sink;
     return this;
 }
 
@@ -101,5 +123,5 @@ SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
 module.exports = {
     DataSourceType: DataSourceScope,ConflationType,
-    Pipeline,Zip,Source,Criteria
+    Pipeline,Zip,Source,Criteria,APISink
 }
