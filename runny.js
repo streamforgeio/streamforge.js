@@ -54,9 +54,9 @@ var p = sf.Pipeline().withComponent(
         return {"request" : JSON.stringify(amount)};
 	}).withSource(sf.Source("bitcoin-calculation", sf.DataSourceType.LOCAL))
     .withSource(sf.Source("ethereum-calculation", sf.DataSourceType.LOCAL))
-    .toSink(sf.APISink("api-compare","compare","http://localhost:4499/api/trxs",
-    {   "method":"POST",
-        "api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
+    .toSink(sf.APISink("api-compare","compare","localhost:4499/api/trxs",
+    {   "http.method":"POST",
+        "http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
 )
 
 console.log(JSON.stringify(p));
