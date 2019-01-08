@@ -3,7 +3,8 @@ const winston = require('winston')
 
 
 var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
-var ConflationType = { CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
+var ConflationType = { NONE : "none", CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
+var DurationType = { SECOND : "second", MINUTE : "minute", HOUR : "hour"}
 
 function PipelineObject(dsType){
     if (dsType)
@@ -34,7 +35,7 @@ function Pipeline(dsType){
 
 function PipelineComponent(aliasParam){
     this.alias = aliasParam;
-    this.conflationContext = { type : ConflationType.KEEP_LATEST};
+    this.conflationContext = { type : ConflationType.NONE};
 }
 PipelineComponent.prototype.withConflation = function(conflation){
     var conflationContext = new Object();
@@ -48,7 +49,18 @@ PipelineComponent.prototype.withConflation = function(conflation){
     return this;
 }
 
-
+PipelineComponent.prototype.withThrottling = function(count,duration, durationType){
+    var throttling = new Object();
+    throttling.count = count
+    throttling.duration = duration
+    if (durationType){
+        throttling.durationType = durationType
+    }else {
+        throttling.durationType = DurationType.SECOND
+    }
+    this.throttling = throttling;
+    return this;
+}
 
 function SinkComponent(aliasParam,sourceParam,additionalProperties){
     this.alias = aliasParam;
@@ -63,8 +75,19 @@ function APISinkObject(aliasParam,sourceParam,url,additionalProperties){
 }
 APISinkObject.prototype = Object.create(SinkComponent.prototype);
 
-function APISink(alias,source,url,httpParams,additionalParams){
-    return new APISinkObject(alias,source,url,httpParams,additionalParams)
+function APISink(alias,source,url,additionalProperties){
+    return new APISinkObject(alias,source,url,additionalProperties)
+}
+
+function WSSinkObject(aliasParam,sourceParam,url,additionalProperties){
+    SinkComponent.call(this,aliasParam,sourceParam,additionalProperties);
+    this["@type"]="WSSink"
+    this.url = url;
+}
+WSSinkObject.prototype = Object.create(SinkComponent.prototype);
+
+function WSSink(alias,source,url,additionalProperties){
+    return new WSSinkObject(alias,source,url,additionalProperties)
 }
 
 function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParams){
@@ -117,11 +140,9 @@ function Zip(aliasParam,isFinal){
     return new ZipObject(aliasParam,isFinal);
 }
 
-
 SourceObject.prototype = Object.create(PipelineComponent.prototype);
-
 
 module.exports = {
     DataSourceType: DataSourceScope,ConflationType,
-    Pipeline,Zip,Source,Criteria,APISink
+    Pipeline,Zip,Source,Criteria,APISink,WSSink
 }
