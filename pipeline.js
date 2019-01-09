@@ -14,6 +14,8 @@ function PipelineObject(dsType){
     this.components = new Array();
 }
 PipelineObject.prototype.withComponent = function(z){
+    if (z["@type"] == 'Broadcast')
+        z.boundOut = undefined
     this.components.push(z);
     return this;
 }
@@ -36,6 +38,7 @@ function Pipeline(dsType){
 function PipelineComponent(aliasParam){
     this.alias = aliasParam;
     this.conflationContext = { type : ConflationType.NONE};
+    this.sinks = new Array();
 }
 PipelineComponent.prototype.withConflation = function(conflation){
     var conflationContext = new Object();
@@ -62,32 +65,31 @@ PipelineComponent.prototype.withThrottling = function(count,duration, durationTy
     return this;
 }
 
-function SinkComponent(aliasParam,sourceParam,additionalProperties){
+function SinkComponent(aliasParam,additionalProperties){
     this.alias = aliasParam;
-    this.source = sourceParam;
     this.additionalProperties = additionalProperties;
 }
 
-function APISinkObject(aliasParam,sourceParam,url,additionalProperties){
-    SinkComponent.call(this,aliasParam,sourceParam,additionalProperties);
+function APISinkObject(aliasParam,url,additionalProperties){
+    SinkComponent.call(this,aliasParam,additionalProperties);
     this["@type"]="APISink"
     this.url = url;
 }
 APISinkObject.prototype = Object.create(SinkComponent.prototype);
 
-function APISink(alias,source,url,additionalProperties){
-    return new APISinkObject(alias,source,url,additionalProperties)
+function APISink(alias,url,additionalProperties){
+    return new APISinkObject(alias,url,additionalProperties)
 }
 
-function WSSinkObject(aliasParam,sourceParam,url,additionalProperties){
-    SinkComponent.call(this,aliasParam,sourceParam,additionalProperties);
+function WSSinkObject(aliasParam,url,additionalProperties){
+    SinkComponent.call(this,aliasParam,additionalProperties);
     this["@type"]="WSSink"
     this.url = url;
 }
 WSSinkObject.prototype = Object.create(SinkComponent.prototype);
 
-function WSSink(alias,source,url,additionalProperties){
-    return new WSSinkObject(alias,source,url,additionalProperties)
+function WSSink(alias,url,additionalProperties){
+    return new WSSinkObject(alias,url,additionalProperties)
 }
 
 function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParams){
@@ -110,39 +112,71 @@ function Criteria(field, operator, value) {
     this.value = value;
 }
 
-function PipelineProcessingComponent(aliasParam){
+function IntermediatePipelineComponent(aliasParam){
     PipelineComponent.call(this,aliasParam);
+    this.sources = new Array();
+    this.sinks = new Array();
+}
+IntermediatePipelineComponent.prototype = Object.create(PipelineComponent.prototype);
+IntermediatePipelineComponent.prototype.toSink = function(sink){
+    if (this["@type"] == 'Broadcast'){
+        this.boundOut++;
+        sink.source = initializeSource(this.alias + "~" + this.boundOut);
+    } else {
+        sink.source = initializeSource(this.alias);
+    }
+    this.sinks.push(sink);
+    return this;
+}
+IntermediatePipelineComponent.prototype.withSource = function(source){
+    this.sources.push(initializeSource(source))
+    return this;
+}
+
+function BroadcastObject(aliasParam,source,outCount){
+    IntermediatePipelineComponent.call(this,aliasParam);
+    this["@type"]="Broadcast"
+    this.sources.push(initializeSource(source));    
+    this.outCount = outCount;
+    this.boundOut = 0;
+}
+BroadcastObject.prototype = Object.create(IntermediatePipelineComponent.prototype);
+
+function Broadcast(aliasParam,source,outCount){
+    return new BroadcastObject(aliasParam,source,outCount);
+}
+
+function PipelineProcessingComponent(aliasParam){
+    IntermediatePipelineComponent.call(this,aliasParam);
     this.func = undefined;
 }
-PipelineProcessingComponent.prototype = Object.create(PipelineComponent.prototype);
+PipelineProcessingComponent.prototype = Object.create(IntermediatePipelineComponent.prototype);
 PipelineProcessingComponent.prototype.withProcess = function(func){
     this.func = func.toString();
     return this;
 }
-PipelineProcessingComponent.prototype.toSink = function(sink){
-    this.sink = sink;
-    return this;
-}
 
-function ZipObject(aliasParam,isFinal){
-    PipelineProcessingComponent.call(this,aliasParam,isFinal);
+function ZipObject(aliasParam){
+    PipelineProcessingComponent.call(this,aliasParam);
     this["@type"]="Zip"
-    this.sources = new Array();
 }
 ZipObject.prototype = Object.create(PipelineProcessingComponent.prototype);
 
-ZipObject.prototype.withSource = function(source){
-    this.sources.push(source);
-    return this;
-}
-
-function Zip(aliasParam,isFinal){
-    return new ZipObject(aliasParam,isFinal);
+function Zip(aliasParam){
+    return new ZipObject(aliasParam);
 }
 
 SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
+function initializeSource(source) {
+    if (typeof source === 'string')
+        return Source(source, DataSourceScope.LOCAL);
+    else
+        return source;
+}
+
 module.exports = {
     DataSourceType: DataSourceScope,ConflationType,
-    Pipeline,Zip,Source,Criteria,APISink,WSSink
+    Pipeline,Zip,Source,Criteria,Broadcast,
+    APISink,WSSink
 }
