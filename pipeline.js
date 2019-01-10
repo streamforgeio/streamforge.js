@@ -188,6 +188,6 @@ function initializeSource(source) {
 
 module.exports = {
     DataSourceType: DataSourceScope,ConflationType,
-    Pipeline,Zip,Source,Criteria,Broadcast,
+    Pipeline,Zip,Source,Criteria,Broadcast,Merge,
     APISink,WSSink
 }

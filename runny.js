@@ -50,20 +50,15 @@ var p = sf.Pipeline().withComponent(
         return {"request" : JSON.stringify(amount)};
 	}).withSource(sf.Source("bitcoin-calculation", sf.DataSourceType.LOCAL))
     .withSource(sf.Source("ethereum-calculation", sf.DataSourceType.LOCAL))
-    /*.toSink(sf.APISink("api-compare","compare","http://localhost:4499/api/trxs",
-    {   "http.method":"POST",
-        "http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
-    .toSink(sf.WSSink("ws-compare","ws://localhost:4498",
-    {   "http.method":"POST",
-        "http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))*/
 ).withComponent(
 	sf.Broadcast("broadcast","compare",2)
-	.toSink(sf.APISink("api-compare-1","http://localhost:4499/api/trxs",
+).withComponent(
+	sf.Merge("merge",2)
+	.withSource("broadcast~0")
+	.withSource("broadcast~1")
+	.toSink(sf.APISink("api-compare","http://localhost:4499/api/trxs",
     {   "http.method":"POST",
-		"http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
-		.toSink(sf.WSSink("ws-compare","ws://localhost:4498",
-		{   "http.method":"POST",
-			"http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))	
+        "http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
 )
 
 console.log(JSON.stringify(p));
