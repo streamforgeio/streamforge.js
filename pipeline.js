@@ -4,7 +4,7 @@ const winston = require('winston')
 
 var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
 var ConflationType = { NONE : "none", CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
-var DurationType = { SECOND : "second", MINUTE : "minute", HOUR : "hour"}
+var DurationType = { SECONDS : "seconds", MINUTES : "minutes", HOURS : "hours"}
 
 function PipelineObject(dsType){
     if (dsType)
@@ -59,7 +59,7 @@ PipelineComponent.prototype.withThrottling = function(count,duration, durationTy
     if (durationType){
         throttling.durationType = durationType
     }else {
-        throttling.durationType = DurationType.SECOND
+        throttling.durationType = DurationType.SECONDS
     }
     this.throttling = throttling;
     return this;
@@ -144,6 +144,17 @@ BroadcastObject.prototype = Object.create(IntermediatePipelineComponent.prototyp
 
 function Broadcast(aliasParam,source,outCount){
     return new BroadcastObject(aliasParam,source,outCount);
+}
+
+function MergeObject(aliasParam,inCount){
+    IntermediatePipelineComponent.call(this,aliasParam);
+    this["@type"]="Merge"  
+    this.inCount = inCount;
+}
+MergeObject.prototype = Object.create(IntermediatePipelineComponent.prototype);
+
+function Merge(aliasParam,inCount){
+    return new MergeObject(aliasParam,inCount);
 }
 
 function PipelineProcessingComponent(aliasParam){

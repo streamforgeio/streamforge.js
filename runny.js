@@ -41,6 +41,7 @@ var p = sf.Pipeline().withComponent(
 ).withComponent(
     sf.Zip("compare", true)
 	.withProcess(function(p1, p2) {
+		print("biii");
 		var amount = {
 			"btc-usd-amount": p1.amount,
             "eth-usd-amount": p2.amount,
@@ -52,7 +53,7 @@ var p = sf.Pipeline().withComponent(
     /*.toSink(sf.APISink("api-compare","compare","http://localhost:4499/api/trxs",
     {   "http.method":"POST",
         "http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
-    .toSink(sf.WSSink("ws-compare","compare","ws://localhost:4498",
+    .toSink(sf.WSSink("ws-compare","ws://localhost:4498",
     {   "http.method":"POST",
         "http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))*/
 ).withComponent(
@@ -60,9 +61,9 @@ var p = sf.Pipeline().withComponent(
 	.toSink(sf.APISink("api-compare-1","http://localhost:4499/api/trxs",
     {   "http.method":"POST",
 		"http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
-	.toSink(sf.APISink("api-compare-2","http://localhost:4499/api/trxs",
-	{   "http.method":"POST",
-		"http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))	
+		.toSink(sf.WSSink("ws-compare","ws://localhost:4498",
+		{   "http.method":"POST",
+			"http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))	
 )
 
 console.log(JSON.stringify(p));
