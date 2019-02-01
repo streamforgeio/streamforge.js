@@ -1,6 +1,6 @@
 const sf = require('./pipeline.js');
 
-var p = sf.Pipeline().withComponent(
+var p = sf.Pipeline("runny-simple-broadcast").withComponent(
 	sf.Zip("bitcoin-calculation")
 	.withProcess(function(p1, p2) {
 		if (p1.vout.length == 0)
@@ -61,4 +61,4 @@ var p = sf.Pipeline().withComponent(
 )
 
 console.log(JSON.stringify(p));
-p.save("/tmp/sf.json")
+p.compile();

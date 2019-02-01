@@ -1,12 +1,14 @@
 const fs = require('fs');
 const winston = require('winston')
-
+const path = require('path');
 
 var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
 var ConflationType = { NONE : "none", CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
 var DurationType = { SECONDS : "seconds", MINUTES : "minutes", HOURS : "hours"}
+var STREAMFORGE_FOLDER = ".streamforge";
 
-function PipelineObject(dsType){
+function PipelineObject(name,dsType){
+    this.name = name;
     if (dsType)
         this.dsType=dsType;
     else 
@@ -19,8 +21,23 @@ PipelineObject.prototype.withComponent = function(z){
     this.components.push(z);
     return this;
 }
-PipelineObject.prototype.save = function(path){
-    fs.writeFile(path, JSON.stringify(this), function(err) {
+
+
+function getPipelineName(){
+    const fullScriptPath = process.mainModule.filename;
+    return fullScriptPath.substring(fullScriptPath.lastIndexOf(path.sep)+1, fullScriptPath.lastIndexOf('.'));
+}
+
+PipelineObject.prototype.compile = function(){
+    fs.mkdir(STREAMFORGE_FOLDER, function(e){
+        if (e.code == "EEXIST")
+            winston.log("debug","folder already exists");
+        else 
+            winston.log("error",e.code);
+    });
+    const pipelineName = getPipelineName();
+    console.log(pipelineName)
+    fs.writeFile(STREAMFORGE_FOLDER + "/" + pipelineName + ".json", JSON.stringify(this), function(err) {
         if(err) {
             return winston.log('error','Error while saving to ' + path);
         }
@@ -31,8 +48,8 @@ PipelineObject.prototype.submit = function(){
     // submit to streamforge.io
 }
 
-function Pipeline(dsType){
-    return new PipelineObject(dsType);
+function Pipeline(name,dsType){
+    return new PipelineObject(name,dsType);
 }
 
 function PipelineComponent(aliasParam){
