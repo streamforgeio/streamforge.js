@@ -36,7 +36,6 @@ PipelineObject.prototype.compile = function(){
             winston.log("error",e.code);
     });
     const pipelineName = getPipelineName();
-    console.log(pipelineName)
     fs.writeFile(STREAMFORGE_FOLDER + "/" + pipelineName + ".json", JSON.stringify(this), function(err) {
         if(err) {
             return winston.log('error','Error while saving to ' + path);

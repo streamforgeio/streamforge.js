@@ -47,5 +47,5 @@ var p = sf.Pipeline("runny-simple-merge").withComponent(
         "http.api-key":"8d77f7d14a4864931f15072255fc1b58de8941cd45a8a896ed4ebf99b93d2e33"}))
 )
 
-console.log(JSON.stringify(p));
+//console.log(JSON.stringify(p));
 p.compile();
