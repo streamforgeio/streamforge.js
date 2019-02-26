@@ -3,12 +3,8 @@ const sf = require('./pipeline.js');
 var p = sf.Pipeline("runny").withComponent(
 	sf.Zip("bitcoin-calculation")
 	.withProcess(function(p1, p2) {
-		if (p1.vout.length == 0)
-			return {
-				'amount': 0
-			}
 		var r = {
-			'amount': (p1.vout[0].amount * p2.body.result.price.last) / 1000000
+			'amount': (p1.amount * p2.body.result.price.last)
 		}
 		return r;
 	})
