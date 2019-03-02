@@ -4,9 +4,10 @@ var p = sf.Pipeline("runny-simple-merge").withComponent(
 	sf.Zip("bitcoin-calculation")
 	.withProcess(function(p1, p2) {
 		var r = {
-			'amount': (p1.amount * p2.body.result.price.last)
+			'amount': (p1.amount * p2.body.result.price.last),
+			"type" : "btc"
 		}
-		return {"request" : JSON.stringify(r)};
+		return {"request" : JSON.stringify(r), "type" : "btc"};
 	})
 	.withSource(
 		sf.Source("btc-raw", sf.DataSourceType.GLOBAL).withThrottling(1,1)
@@ -21,7 +22,8 @@ var p = sf.Pipeline("runny-simple-merge").withComponent(
 	sf.Zip("ethereum-calculation")
 	.withProcess(function(p1, p2) {
 		var r = {
-			'amount': (p1.amount * p2.body.result.price.last) / 1000000
+			'amount': (p1.amount * p2.body.result.price.last),
+			"type" : "eth"
 		}
 		return {"request" : JSON.stringify(r)};
 	})
