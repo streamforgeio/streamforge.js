@@ -21,7 +21,7 @@ var p = sf.Pipeline("runny-simple-merge").withComponent(
 	sf.Zip("ethereum-calculation")
 	.withProcess(function(p1, p2) {
 		var r = {
-			'amount': (p1.gas * p2.body.result.price.last) / 1000000
+			'amount': (p1.amount * p2.body.result.price.last) / 1000000
 		}
 		return {"request" : JSON.stringify(r)};
 	})
