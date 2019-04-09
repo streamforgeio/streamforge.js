@@ -1,8 +1,9 @@
 {
   "name": "streamforge",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "lockfileVersion": 1,
   "requires": true,
+  "main": "pipeline.js",
   "dependencies": {
     "async": {
       "integrity": "sha512-fNEiL2+AZt6AlAw/29Cr0UDe4sRAHCpEHh54WMz+Bb7QfNcFw4h3loofyJpLeQs4Yx7yuqu/2dLgM5hKOs6HlQ==",

@@ -24,8 +24,8 @@ PipelineObject.prototype.withComponent = function(z){
 
 
 function getPipelineName(){
-    const fullScriptPath = process.mainModule.filename;
-    return fullScriptPath.substring(fullScriptPath.lastIndexOf(path.sep)+1, fullScriptPath.lastIndexOf('.'));
+    //const fullScriptPath = process.mainModule.filename;
+    return "temp";//fullScriptPath.substring(fullScriptPath.lastIndexOf(path.sep)+1, fullScriptPath.lastIndexOf('.'));
 }
 
 PipelineObject.prototype.compile = function(){
@@ -36,6 +36,7 @@ PipelineObject.prototype.compile = function(){
             winston.log("error",e.code);
     });
     const pipelineName = getPipelineName();
+    winston.log('info',"pipelineName:" + pipelineName);
     fs.writeFile(STREAMFORGE_FOLDER + "/" + pipelineName + ".json", JSON.stringify(this), function(err) {
         if(err) {
             return winston.log('error','Error while saving to ' + path);
