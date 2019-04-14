@@ -25,7 +25,8 @@ PipelineObject.prototype.withComponent = function(z){
 
 function getPipelineName(){
     //const fullScriptPath = process.mainModule.filename;
-    return "temp";//fullScriptPath.substring(fullScriptPath.lastIndexOf(path.sep)+1, fullScriptPath.lastIndexOf('.'));
+    //fullScriptPath.substring(fullScriptPath.lastIndexOf(path.sep)+1, fullScriptPath.lastIndexOf('.'));
+    return "temp";
 }
 
 PipelineObject.prototype.compile = function(){
