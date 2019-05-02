@@ -175,17 +175,6 @@ function Merge(aliasParam,inCount){
     return new MergeObject(aliasParam,inCount);
 }
 
-function FlowObject(aliasParam){
-    PipelineProcessingComponent.call(this,aliasParam);
-    this["@type"]="Flow"  
-}
-FlowObject.prototype = Object.create(PipelineProcessingComponent.prototype);
-
-function Flow(aliasParam){
-    return new FlowObject(aliasParam);
-}
-
-
 function PipelineProcessingComponent(aliasParam){
     IntermediatePipelineComponent.call(this,aliasParam);
     this.func = undefined;
@@ -204,6 +193,16 @@ ZipObject.prototype = Object.create(PipelineProcessingComponent.prototype);
 
 function Zip(aliasParam){
     return new ZipObject(aliasParam);
+}
+
+function FlowObject(aliasParam){
+    PipelineProcessingComponent.call(this,aliasParam);
+    this["@type"]="Flow"  
+}
+FlowObject.prototype = Object.create(PipelineProcessingComponent.prototype);
+
+function Flow(aliasParam){
+    return new FlowObject(aliasParam);
 }
 
 SourceObject.prototype = Object.create(PipelineComponent.prototype);
