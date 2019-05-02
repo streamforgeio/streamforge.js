@@ -176,10 +176,10 @@ function Merge(aliasParam,inCount){
 }
 
 function FlowObject(aliasParam){
-    IntermediatePipelineComponent.call(this,aliasParam);
+    PipelineProcessingComponent.call(this,aliasParam);
     this["@type"]="Flow"  
 }
-FlowObject.prototype = Object.create(IntermediatePipelineComponent.prototype);
+FlowObject.prototype = Object.create(PipelineProcessingComponent.prototype);
 
 function Flow(aliasParam){
     return new FlowObject(aliasParam);
