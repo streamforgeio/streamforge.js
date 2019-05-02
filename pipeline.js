@@ -175,6 +175,17 @@ function Merge(aliasParam,inCount){
     return new MergeObject(aliasParam,inCount);
 }
 
+function FlowObject(aliasParam){
+    IntermediatePipelineComponent.call(this,aliasParam);
+    this["@type"]="Flow"  
+}
+FlowObject.prototype = Object.create(IntermediatePipelineComponent.prototype);
+
+function Flow(aliasParam){
+    return new FlowObject(aliasParam);
+}
+
+
 function PipelineProcessingComponent(aliasParam){
     IntermediatePipelineComponent.call(this,aliasParam);
     this.func = undefined;
