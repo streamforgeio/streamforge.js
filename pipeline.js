@@ -227,5 +227,5 @@ function initializeSource(source) {
 module.exports = {
     DataSourceType: DataSourceScope,ConflationType,
     Pipeline,Zip,Source,Criteria,Broadcast,Merge,Flow,
-    APISink,WSSink
+    APISink,WSSink,LogSink
 }
