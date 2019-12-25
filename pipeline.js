@@ -110,6 +110,16 @@ function WSSink(alias,url,additionalProperties){
     return new WSSinkObject(alias,url,additionalProperties)
 }
 
+function LogSinkObject(aliasParam){
+    SinkComponent.call(this,aliasParam);
+    this["@type"]="LogSink"
+}
+WSSinkObject.prototype = Object.create(SinkComponent.prototype);
+
+function LogSink(alias){
+    return new WSSinkObject(alias)
+}
+
 function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParams){
     PipelineComponent.call(this,aliasParam);
     this["@type"]="Source"
