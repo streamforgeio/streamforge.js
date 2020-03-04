@@ -30,12 +30,12 @@ function getPipelineName(){
 }
 
 PipelineObject.prototype.compile = function(){
-    fs.mkdir(STREAMFORGE_FOLDER, function(e){
-        if (e.code == "EEXIST")
-            winston.log("debug","folder already exists");
-        else 
-            winston.log("error",e.code);
-    });
+    try {
+        fs.mkdirSync(STREAMFORGE_FOLDER)
+        winston.log("debug","folder created");
+    }catch (e){
+        winston.log("error",e.code);
+    }
     const pipelineName = getPipelineName();
     winston.log('info',"pipelineName:" + pipelineName);
     fs.writeFile(STREAMFORGE_FOLDER + "/" + pipelineName + ".json", JSON.stringify(this), function(err) {
@@ -43,7 +43,23 @@ PipelineObject.prototype.compile = function(){
             return winston.log('error','Error while saving to ' + path);
         }
         winston.log('info',"The file was saved!");
-    });             
+    });   
+    var regSinkArray = new Array();
+    this.components.forEach(c => {
+        if (c.sinks){
+            c.sinks.forEach(s => {
+                if (s["@type"] === 'RegAPISink'){
+                    regSinkArray.push(s.alias)
+                }
+            } )
+        }
+    })     
+    fs.writeFile(STREAMFORGE_FOLDER + "/" + pipelineName + "-reg.json", JSON.stringify(regSinkArray), function(err) {
+        if(err) {
+            return winston.log('error','Error while saving to ' + path);
+        }
+        winston.log('info',"The file was saved!");
+    });  
 },
 PipelineObject.prototype.submit = function(){
     // submit to streamforge.io
@@ -97,6 +113,16 @@ APISinkObject.prototype = Object.create(SinkComponent.prototype);
 
 function APISink(alias,url,additionalProperties){
     return new APISinkObject(alias,url,additionalProperties)
+}
+
+function RegAPISinkObject(aliasParam){
+    SinkComponent.call(this,aliasParam);
+    this["@type"]="RegAPISink"
+}
+RegAPISinkObject.prototype = Object.create(SinkComponent.prototype);
+
+function RegAPISink(alias){
+    return new RegAPISinkObject(alias)
 }
 
 function WSSinkObject(aliasParam,url,additionalProperties){
@@ -227,5 +253,5 @@ function initializeSource(source) {
 module.exports = {
     DataSourceType: DataSourceScope,ConflationType,
     Pipeline,Zip,Source,Criteria,Broadcast,Merge,Flow,
-    APISink,WSSink,LogSink
+    APISink,WSSink,LogSink,RegAPISink
 }
