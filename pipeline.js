@@ -43,22 +43,6 @@ PipelineObject.prototype.compile = function(){
             return winston.log('error','Error while saving to ' + path);
         }
         winston.log('info',"The file was saved!");
-    });   
-    var regSinkArray = new Array();
-    this.components.forEach(c => {
-        if (c.sinks){
-            c.sinks.forEach(s => {
-                if (s["@type"] === 'RegAPISink'){
-                    regSinkArray.push(s.alias)
-                }
-            } )
-        }
-    })     
-    fs.writeFile(STREAMFORGE_FOLDER + "/" + pipelineName + "-reg.json", JSON.stringify(regSinkArray), function(err) {
-        if(err) {
-            return winston.log('error','Error while saving to ' + path);
-        }
-        winston.log('info',"The file was saved!");
     });  
 },
 PipelineObject.prototype.submit = function(){
