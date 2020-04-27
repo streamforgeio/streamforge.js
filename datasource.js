@@ -25,21 +25,20 @@ function PredefinedSourceType(alias){
     return new PredefinedSourceTypeObject(alias);
  }
 
-function OndemandSourceTypeObject(alias, identifier, ...params){
+function OndemandSourceTypeObject(alias, ...params){
     SourceTypeObject.call(this, alias, DataSourceScope.GLOBAL);
     this["@type"]="Predefined";
     this.params = params;
-    this.identifier = identifier;
 }
 OndemandSourceTypeObject.prototype = Object.create(SourceTypeObject.prototype);
 
-function OndemandSourceType(alias, identifier, ...params){
-    return new OndemandSourceTypeObject(alias, identifier, params);
+function OndemandSourceType(alias, ...params){
+    return new OndemandSourceTypeObject(alias, params);
  }
 
 
 function TwitterSourceTypeObject(identifier, ...params){
-    OndemandSourceTypeObject.call(this, TWITTER_ALIAS, identifier, params);
+    OndemandSourceTypeObject.call(this, TWITTER_ALIAS, params);
     this["@type"]="Twitter";
     
 }
@@ -49,14 +48,14 @@ function TwitterSourceType(...params){
     return new TwitterSourceTypeObject(params);
  }
 
-function CustomSourceTypeObject(alias, identifier, ...params){
-    OndemandSourceTypeObject.call(this, alias, identifier, params);
+function CustomSourceTypeObject(alias, ...params){
+    OndemandSourceTypeObject.call(this, alias, params);
     this["@type"]="Custom";
 }
 CustomSourceTypeObject.prototype = Object.create(SourceTypeObject.prototype);
 
-function CustomSourceType(alias, identifier,...params){
-    return new CustomSourceTypeObject(alias, identifier, params);
+function CustomSourceType(alias, ...params){
+    return new CustomSourceTypeObject(alias, params);
  }
 
 function IntermediateSourceTypeObject(alias){
