@@ -1,8 +1,9 @@
 const fs = require('fs');
 const winston = require('winston')
 const path = require('path');
+const datasource = require('./datasource')
 
-var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
+
 var ConflationType = { NONE : "none", CUSTOM : "custom", KEEP_LATEST : "keepLatest", KEEP_EARLIEST : "keepEarliest"};
 var DurationType = { SECONDS : "seconds", MINUTES : "minutes", HOURS : "hours"}
 var STREAMFORGE_FOLDER = ".streamforge";
@@ -130,18 +131,18 @@ function LogSink(alias){
     return new LogSinkObject(alias)
 }
 
-function SourceObject(aliasParam,scopeParam,filterFunc,exclusionsParams){
-    PipelineComponent.call(this,aliasParam);
+function SourceObject(sourceTypeParam,filterFunc,exclusionsParams){
+    PipelineComponent.call(this,sourceTypeParam.alias);
     this["@type"]="Source"
     if (filterFunc)
         this.filter = filterFunc.toString();
+    this.sourceType = sourceTypeParam;
     this.exclusions = exclusionsParams;
-    this.scope = scopeParam;
 }
 SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
-function Source(alias,scope,filterFunc,exclusions){
-   return new SourceObject(alias,scope,filterFunc,exclusions);
+function Source(sourceType,filterFunc,exclusions){
+   return new SourceObject(sourceType,filterFunc,exclusions);
 }
 
 function Criteria(field, operator, value) {
@@ -229,13 +230,16 @@ SourceObject.prototype = Object.create(PipelineComponent.prototype);
 
 function initializeSource(source) {
     if (typeof source === 'string')
-        return Source(source, DataSourceScope.LOCAL);
+        return new Source(datasource.IntermediateSourceType(source));
     else
         return source;
 }
 
 module.exports = {
-    DataSourceType: DataSourceScope,ConflationType,
+    PredefinedSources : datasource,
+    TwitterSourceType : datasource.TwitterSourceType,
+    CustomSource : datasource.CustomSourceType,
+    DurationType, ConflationType,
     Pipeline,Zip,Source,Criteria,Broadcast,Merge,Flow,
     APISink,WSSink,LogSink,RegAPISink
 }
