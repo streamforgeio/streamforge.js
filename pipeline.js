@@ -237,7 +237,7 @@ function initializeSource(source) {
 
 module.exports = {
     PredefinedSources : datasource,
-    TwitterSourceType : datasource.TwitterSourceType,
+    Param : datasource.Param,
     CustomSource : datasource.CustomSourceType,
     DurationType, ConflationType,
     Pipeline,Zip,Source,Criteria,Broadcast,Merge,Flow,

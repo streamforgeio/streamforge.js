@@ -1,7 +1,7 @@
 const ETHEREUM_PENDING_TRANSACTIONS_ALIAS = "eth-pending";
 const ICO_PARITY_ALIAS = "ico-parity";
 const BITCOIN_TRANSACTIONS_ALIAS = "btc-raw";
-const TWITTER_ALIAS = "twitter";
+const TWITTER_ALIAS = "twitter-sentiment-dsod:0.0.2";
 
 var DataSourceScope = { GLOBAL : "global", LOCAL : "local"};
 
@@ -25,38 +25,26 @@ function PredefinedSourceType(alias){
     return new PredefinedSourceTypeObject(alias);
  }
 
-function OndemandSourceTypeObject(alias, ...params){
+function OndemandSourceTypeObject(alias, params){
     SourceTypeObject.call(this, alias, DataSourceScope.GLOBAL);
-    this["@type"]="Predefined";
+    this["@type"]="Ondemand";
     this.params = params;
 }
 OndemandSourceTypeObject.prototype = Object.create(SourceTypeObject.prototype);
 
-function OndemandSourceType(alias, ...params){
+function OndemandSourceType(alias, params){
     return new OndemandSourceTypeObject(alias, params);
- }
-
-
-function TwitterSourceTypeObject(identifier, ...params){
-    OndemandSourceTypeObject.call(this, TWITTER_ALIAS, params);
-    this["@type"]="Twitter";
-    
 }
-TwitterSourceTypeObject.prototype = Object.create(SourceTypeObject.prototype);
 
-function TwitterSourceType(...params){
-    return new TwitterSourceTypeObject(params);
- }
-
-function CustomSourceTypeObject(alias, ...params){
-    OndemandSourceTypeObject.call(this, alias, params);
-    this["@type"]="Custom";
+function ParamObject(key,value){
+    this.key = key;
+    this.value = value;
 }
-CustomSourceTypeObject.prototype = Object.create(SourceTypeObject.prototype);
 
-function CustomSourceType(alias, ...params){
-    return new CustomSourceTypeObject(alias, params);
+function Param(key,value){
+    return new ParamObject(key,value);
  }
+
 
 function IntermediateSourceTypeObject(alias){
     SourceTypeObject.call(this, alias, DataSourceScope.LOCAL);
@@ -77,7 +65,8 @@ module.exports = {
     ETHEREUM_PENDING_TRANSACTIONS,
     ICO_PARITY,
     BITCOIN_TRANSACTIONS,
-    TwitterSourceType: TwitterSourceType,
-    CustomSourceType: CustomSourceType,
-    IntermediateSourceType: IntermediateSourceType
+    TwitterSentiment: function(...params) { return new OndemandSourceType(TWITTER_ALIAS,params)} ,
+    OndemandSourceType: OndemandSourceType,
+    IntermediateSourceType: IntermediateSourceType,
+    Param : Param
 }
